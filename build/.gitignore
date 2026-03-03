@@ -1,0 +1,13 @@
+main
+*.out
+*.exe
+*.o
+
+# build output
+build/
+*.o
+*.out
+*.exe
+
+# editor
+.vscode/

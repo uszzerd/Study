@@ -29,6 +29,7 @@ void show_pointer(void *x)
     show_bytes((byte_pointer) &x, sizeof(void*));
 }
 
+// 입력을 int, float 형으로 입력
 int main(int argc, char **argv)
 {
     int i = atoi(argv[1]);
