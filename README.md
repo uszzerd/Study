@@ -1,6 +1,11 @@
- 이 Repository는
-Computer Systems A Programmer's Perspective (CS:APP)
-책 내용의 C code를 연습한 과정입니다.
+ Computer System의 공부과정을 기록한 것입니다.
 
-Youtube에 15-213/18-213/15-513: Intro to Computer Systems, Fall 2017
-Carnegie Mellon University - Randal Bryant 교수님의 강의를 참고했습니다.
+교재 : Computer Systems A Programmer's Perspective (CS:APP)
+강의 : Youtube, 15-213/18-213/15-513: Intro to Computer Systems, Fall 2017 Carnegie Mellon University - Randal Bryant
+
+OS : Rocky 9 (RHEL9)
+IDE : Visual Studio Code
+
+Part-1. Type, bit, Floating Point, Round
+Part-2. 
+
