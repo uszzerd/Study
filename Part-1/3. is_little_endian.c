@@ -31,5 +31,8 @@ ex)
 01 00 00 00 : Little endian
 
 출력해보면 temp[0] = 1로 C는 Little endian이다
+ -> 라고 생각했는데 찾아보니 나의 CPU/플랫폼이 little-endian 이다.
+
+ C는 특정 endian을 갖지 않고, Hardware Architecture가 endian을 갖게 되는데, 대부분의 x86,x86-64 : little-endian이다.
 
 */

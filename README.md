@@ -1,11 +1,20 @@
- Computer System의 공부과정을 기록한 것입니다.
+# Computer Systems Study
 
-교재 : Computer Systems A Programmer's Perspective (CS:APP)
-강의 : Youtube, 15-213/18-213/15-513: Intro to Computer Systems, Fall 2017 Carnegie Mellon University - Randal Bryant
+Computer System의 공부과정을 기록한 것입니다.
 
-OS : Rocky 9 (RHEL9)
+## 교재
+Computer Systems: A Programmer's Perspective (CS:APP)
+
+## 강의
+YouTube  
+15-213 / 18-213 / 15-513: Intro to Computer Systems  
+Fall 2017  
+Carnegie Mellon University  
+Randal Bryant
+
+## 개발 환경
+OS : Rocky Linux 9 (RHEL9)  
 IDE : Visual Studio Code
 
-Part-1. Type, bit, Floating Point, Round
-Part-2. 
-
+## 학습 내용
+Part 1. Type, Bit, Floating Point, Round  
