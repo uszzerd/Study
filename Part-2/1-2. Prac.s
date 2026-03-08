@@ -30,7 +30,7 @@ multstore:
 	.size	multstore, .-multstore
 	.section	.rodata.str1.1,"aMS",@progbits,1
 .LC0:
-	.string	"2 * 3 --> &ld\n"
+	.string	"2 * 3 --> %ld\n"
 	.text
 	.globl	main
 	.type	main, @function

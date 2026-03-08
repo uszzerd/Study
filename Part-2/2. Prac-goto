@@ -1,0 +1,27 @@
+goto version
+= 
+사람이 직접 C로 번역하는 과정, 어셈블리 ↔ C 사이의 사고 훈련
+
+if else, for, while, switch
+
+if else :
+    t = test-expr;
+    if (!t)
+        goto fales;
+    then-statment
+    goto-done;
+false:
+    else-statment;
+done:
+
+ 
+Do-While :
+done    
+    body-statement
+    while(test-expr);
+
+loop:
+    body-statement
+    t = (test-expr);
+    if (t) 
+        goto loop:
