@@ -37,3 +37,24 @@ int main() {
     }
     return 0;
 }
+
+
+/*
+최적화 파일을 보면
+	movl	$0, %eax
+	call	__isoc99_scanf
+	movl	$.LC2, %edi
+	call	puts
+
+.LC2:
+	.string	"Wrong!"
+	.text
+	.globl	main
+	.type	main, @function
+
+사실상 return 0을 가정하고 컴파일을 진행했다.
+-> 입력값 x = 302 / 7 이 정답인데 정수형이라 조건을 만족하는 값이 없다. round 되기 때문
+
+그렇기에 컴파일러가 해당 코드는 항상 0을 return 한다고 가정하고 진행한다.
+
+*/
