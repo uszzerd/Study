@@ -55,3 +55,23 @@ int main() {
     vulnerable();
     return 0;
 }
+
+
+/*
+ROP (Return-Oriented Programming)
+pop을 rsp에 저장해 두는 방식을 이용해서 rsp에 내가 원하는 값 + 주소를 넣어두는 기법
+
+pop rdi(first argument), rsi(second argument)  = $rsp + 0x08 -> rsp += 8
+ret => rsp += 8
+
+해당 조건을 이용
+
+gadget을 이용해서
+pop
+ret
+
+순으로 있는 구조를 찾음 -> 원하는 값 및 주소를 넣을 수 있음
+
+해당 문제에서는 win() 에 가야 하는데, rdi = 0xdead, rsi = 0xbeef 를 갖고 있어야 ROP chaining이 print됨
+
+*/
