@@ -22,6 +22,13 @@ Part 2. Machine-Level
 Part 3. Optimizing Program
 Part 4. Memory Hierarchy
 Part 5. Linking
+Part 6. ECF
+Part 7. I/O
 
 
-Ai-generated folder는 Ai를 통해 문제를 만들고 풀어본 것 입니다.
+
+C 코드 → 어셈블리 → 기계어 → CPU 실행
+                              ↕
+                         메모리 계층
+                              ↕
+                         OS 개입

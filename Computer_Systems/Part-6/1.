@@ -1,0 +1,158 @@
+   1. ECF
+Exceptional Control Flow
+프로그램의 정상적인 제어 흐름을 깨는 모든 매커니즘
+
+1. Exception - H/W, OS가 개입
+2. Process - 실행 단위
+3. Signal - 프로세스 간 비동기 이벤트
+4. Nonlocal Jump - 흐름을 강제로 점프
+
+ECF = OS가 개입해서 control flow를 바꾸는 모든 것
+
+
+   2. Exception
+CPU가 명령 실행 중 예외 상황 발생 -> Kernel 강제 점프
+User Program
+   ↓ (exception 발생)
+CPU가 kernel mode 전환
+   ↓
+Exception Handler 실행
+   ↓
+복귀 or 종료
+
+Exception Table = 각 예외 번호에 대해 Handler 주소가 저장되어 있는 table
+ex) page fault -> A handler, systemcall -> B handler
+
+-1. Interrupt 외부 이벤트(I/O, timer), H/W, Kernel 에서의 exception, handler 처리 -> 복귀
+-2. Trap 의도적 예외(system call) handler 처리 -> 복귀
+-3. Fault 오류(page fault 등) handler 처리 -> 복귀(수정 후 재실행)
+-4. Abort 치명적 오류, handler 처리 -> 복귀X
+
+System Call = Trap
+read(), write(), fork() → trap 발생
+→ kernel mode 진입
+→ OS가 처리
+→ user mode 복귀
+
+사용자 프로그램이 직접 disk, memory, process table 등을 건드리면 sys가 망가지게 된다.
+그래서 OS는 다음 원칙을 사용한다.
+-1. user mode는 제한된 권한만 사용
+-2. critical한 작업은 kernel에서만 수행
+-3. user -> trap을 통해 요청
+
+
+   3. Process
+실행 중인 프로그램 + 독립적인 주소 공간
+Process = 실행 단위
+
+프로세스는 사용자에게 두 가지 abstraction을 진행한다.
+-1. Logical Control Flow
+각 프로세스는 자기 혼자 CPU를 쓰는 것처럼 보인다.
+time sclie / context switch를 통해 CPU를 번갈아 사용하며 각각 연속되게 실행되는 것 처럼 사용한다.
+-2. Private Address Space
+각 프로세스는 자기만의 메모리를 가진 것처럼 보인다.
+실제로는 kernel이 virtual memory로 격리시킨다. 
+
+Concurrent (동시성): 두 프로세스의 Logical Control Flow가 시간상 겹치는 것. 단일 코어에서도 가능 (time-slicing).
+Parallel (병렬성): 두 프로세스가 물리적으로 동시에 실행되는 것. 멀티코어 필요.
+
+===
+P1: ──────     ──────
+P2:      ──────        (Concurrent, not Parallel)
+---
+P1: ──────────
+P2: ──────────         (Concurrent AND Parallel)
+===
+
+context switch = 프로세스가 바뀔 때 kernel은 현재 실행 상태를 저장하고 다른 프로세스 상태를 복원한다.
+저장/복원 대상:
+program counter
+general-purpose registers
+stack pointer
+condition codes
+기타 커널 상태
+
+exception / interrupt이 들어오면
+Kernel -> process state 저장 -> 다른 process schedul -> 복원 후 실행
+
+-1. fork = 흐름 복제됨
+주소 공간 복사 (Copy-on-write)
+PC(Program Counter)도 복제됨 -> Parent , Child가 같은 코드 위치에서 시작
+-2. execve = 완전 교체
+기존 code/stack/heap -> 전부 사라짐
+완전히 새로운 프로그램
+-3. wait = 동기화
+부모가 자식 종료를 확인하고 상태를 회수하는 함수, Zombie 제거
+Zombie : 자식이 종료해도 kernel은 바로 흔적을 지우지 않는다. -> 부모가 종료 상태를 읽을 수 있게 process table entry 일부를 남겨둔다
+Orphan : 부모 죽음, 자식은 살아 있음-> init이 입양
+
+
+   4. Signal
+OS가 프로세스에게 보내는 비동기 이벤트
+Signal = 실행 흐름을 외부/커널이 비동기로 깨는 매커니즘
+
+-fork/exec/wait -> control flow
+-signal -> 비정상(ECF) control flow
+
+SIGINT: Ctrl+C
+SIGTSTP: Ctrl+Z
+SIGCHLD: 자식 종료
+SIGSEGV: 잘못된 메모리 접근
+SIGKILL: 강제 종료
+etc
+-> signal은 프로세스 실행 흐름을 중간에 끊어 개입한다.
+
+signal의 3단계
+-1. Sending : kernel이나 다른 프로세스가 signal을 보낸다
+-2. Pending : signal이 기록되어 있으나 아직 처리되지 않은 상태
+-3. Delivery : 실제로 프로세스에 전달되어 default action / handler가 수행된다
+-> signal은 보내는 즉시 실행이 아니다
+
+Pending Bit
+각 프로세스는 signal 종류별로 Pending상태를 가질 수 있다
+SIGINT -> block => pending으로 남음, 나중에 unblock되면 delivery
+1Bit이기에 SIGCHLD가 3번 와도 delivery는 1번만 발생할 수 있다. -> waitpid를 사용해야하는 이유
+
+Signal Mask
+프로세스는 특정 signal을 잠시 block할 수 있다
+critical section 보호
+race condition 방지
+handler 실행 중 재진입 방지
+
+Delivery가 일어나는 시점
+signal은 kernel이 프로세스에 전달 가능하다고 판단하는 시점에 delivery된다
+- 프로세스가 사용자 모드로 돌아가기 직전
+- 커널 경계를 통과할 때
+
+signal의 기본 동작 3가지
+-1. Defulat Action : kernel이 정해둔 기본 동작 수행
+-2. Ignore : signal을 무시, 모든 signal을 무시 가능한 것은 아님 ex) SIGKILL, SIGSTOP
+-3. Catch : 사용자 정의 handler 실행
+
+Handler의 실행 방식
+원래 프로그램이 정상 실행 중일 때 signal이 전달되면:
+
+현재 흐름 중단 -> 커널이 사용자 stack/context를 조정 -> handler 실행 -> 끝나면 원래 코드 위치로 복귀
+
+겉보기에는 함수 호출 같지만,실제로는 갑자기 끼어드는 비동기 함수다.
+=> main흐름과 handler 흐름이 같은 전역 상태를 공유할 수 있다. -> race condition이 발생한다.
+race condition : 두 개 이상의 프로세스가 공통 자원을 concurrently하게 읽거나 쓰는 동작을 할 때
+
+Async-Signal-Safety
+handler에서 printf를 사용한다 가정 -> 전역 상태 / 버퍼를 사용하는데 만약 main도 printf를 실행 중이라면 동작 이상이 생길 수 있다.
+-함수가 reentrant하지 않을 수 있음
+-내부 lock/buffer/heap 상태가 깨질 수 있음
+-> Async-Signal-Safety를 사용해야 하는 이유
+
+
+   5. Nonlocal Jumps
+setjmp / longjmp는 함수 호출 스택의 정상적인 return 경로를 무시하고 점프한다.
+책에 작성되어 있음
+
+
+   6. 정리
+- Process = 독립된 실행
+- Kernel은 언제든 Process에 끼어들 수 있다
+- 끼어드는 방법은 exception이고, 프로세스에서는 signal형태로 받게된다.
+-> System Program은 항상 내 코드 말고도 누가 중간에 개입할 수 있다를 전제로 짜야한다.
+

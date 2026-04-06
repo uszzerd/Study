@@ -41,3 +41,30 @@ void main(int argc, char **argv)
 
     return;
 }
+
+
+2. state machine
+size = argc
+size != 2 -> 설정 틀림
+answer = atoi(argv[1])
+
+eax = 0x7 -> Access? 아마 재귀적으로 7번 돌고난 뒤 비밀번호가 맞다면 통과되는 식으로
+switch 문으로 되어있음
+notrack jmpq *%rax -> rax 부분으로 jmp
+
+add    $0x1,%rbx
+movzbl -0x1(%rbx),%esi
+char를 한개씩 확인하는 구조
+
+0x52, 0x45, 0x56, 0x33, 0x52, 0x53, 0x45
+REV3RSE
+Access Granted! Flag: RE{st4t3_m4ch1n3_m4st3r}
+
+
+3. data layout
+
+table
+verify -> 0xc3 = edx -> Goal
+
+rdi = *(rsi + 8) 
+
